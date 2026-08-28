@@ -20,6 +20,4 @@ def engineer_features(frame: pd.DataFrame) -> pd.DataFrame:
 		result["distance_log"] = np.log1p(result["distance"].clip(lower=0))
 	if {"distance", "weight"}.issubset(result.columns):
 		result["weight_per_mile"] = result["weight"] / result["distance"].clip(lower=1)
-	if {"market_index", "quote_signal"}.issubset(result.columns):
-		result["market_quote_interaction"] = result["market_index"] * result["quote_signal"]
 	return result

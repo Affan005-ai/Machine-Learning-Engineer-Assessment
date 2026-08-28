@@ -13,7 +13,7 @@ from sklearn.preprocessing import OneHotEncoder
 
 from src.clean import clean_data
 from src.features import engineer_features
-from src.model import predict, save_model, train_model
+from src.model import predict, save_model, train_model, tune_model
 
 
 def train_linear(features: pd.DataFrame, target: pd.Series) -> Pipeline:
@@ -51,9 +51,12 @@ def main() -> None:
 	linear = train_linear(features.loc[train_mask], target.loc[train_mask])
 	linear_predictions = np.expm1(linear.predict(features.loc[test_mask]))
 	report_metrics("Linear Regression", target.loc[test_mask], pd.Series(linear_predictions, index=target.loc[test_mask].index))
-	validation_model = train_model(features.loc[train_mask], target.loc[train_mask])
+	validation_model, best_parameters = tune_model(features.loc[train_mask], target.loc[train_mask])
+	print(f"Best Random Forest parameters: {best_parameters}")
 	report_metrics("Random Forest", target.loc[test_mask], predict(validation_model, features.loc[test_mask]))
-	final_model = train_model(features, target)
+	final_model = train_model(features, target, **{
+		key.replace("regressor__", ""): value for key, value in best_parameters.items()
+	})
 	save_model(final_model, args.model)
 	print(f"Saved final model to {args.model}")
 
