@@ -42,6 +42,7 @@ def main() -> None:
 	args = parser.parse_args()
 	raw = pd.read_csv(args.input)
 	target = raw.pop("posted_rate").astype(float)
+	raw = raw.drop(columns=["load_id"], errors="ignore")
 	dates = pd.to_datetime(raw["date"], errors="coerce")
 	features = engineer_features(clean_data(raw))
 	train_mask = dates < pd.Timestamp("2025-09-01")
